@@ -5,4 +5,7 @@
 
     <item
         android:title="Response" android:id="@+id/menuResponse"/>
+
+    <item
+        android:id="@+id/menu_clear" android:title="Clear"/>
 </menu>

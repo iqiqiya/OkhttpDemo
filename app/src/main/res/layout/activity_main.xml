@@ -15,7 +15,7 @@
             android:id="@+id/tv_text"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="Hello World!" />
+            android:text="请点击页面右上角菜单进行功能选择" />
     </ScrollView>
 
 

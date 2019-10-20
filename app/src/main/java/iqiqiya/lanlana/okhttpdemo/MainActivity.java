@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.HeaderViewListAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -51,8 +52,16 @@ public class MainActivity extends AppCompatActivity {
             case R.id.menuResponse:
                 response();
                 break;
+            case R.id.menu_clear:
+                clear();
+                break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void clear(){
+        mTextView.setText("");
+        Toast.makeText(MainActivity.this,"已经清空",Toast.LENGTH_SHORT).show();
     }
 
     private void response(){
