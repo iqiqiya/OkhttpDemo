@@ -2,14 +2,21 @@ package iqiqiya.lanlana.okhttpdemo;
 
 import androidx.appcompat.app.AppCompatActivity;
 import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Headers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.internal.http2.Header;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.HeaderViewListAdapter;
 import android.widget.TextView;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
@@ -41,8 +48,43 @@ public class MainActivity extends AppCompatActivity {
             case R.id.menuGet:
                 get();
                 break;
+            case R.id.menuResponse:
+                response();
+                break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void response(){
+        Request.Builder builder = new Request.Builder();
+        builder.url("https://github.com/square/okhttp/blob/master/README.md");
+        Request request = builder.build();
+        Call call = mClient.newCall(request);
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Log.d(TAG, "onFailure: call = [" + call + "], e = " + e + "]");
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                Log.d(TAG, "onResponse: call = [" + call + "], reponse = " + response + "]");
+
+                int code = response.code();
+                Headers headers = response.headers();
+                String content = response.body().string();
+                final StringBuilder buf = new StringBuilder();
+                buf.append("code："+code);
+                buf.append("\nHeaders：" + headers);
+                buf.append("\nbody："+ content);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mTextView.setText(buf.toString());
+                    }
+                });
+            }
+        });
     }
 
     private void get(){
