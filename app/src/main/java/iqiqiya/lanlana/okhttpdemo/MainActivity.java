@@ -4,12 +4,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Headers;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.internal.http2.Header;
 
+import android.content.ReceiverCallNotAllowedException;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,6 +32,10 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private final OkHttpClient mClient = new OkHttpClient();
     private TextView mTextView;
+    private String POST_URL = "https://api.github.com/markdown/raw";
+
+    private MediaType MEDIA_TYPE_MARKDOWN
+            = MediaType.parse("text/x-markdown; charset=utf-8");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,8 +63,38 @@ public class MainActivity extends AppCompatActivity {
             case R.id.menu_clear:
                 clear();
                 break;
+            case R.id.menuPost:
+                post();
+                break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void post(){
+        Request.Builder builder = new Request.Builder();
+        builder.url(POST_URL);
+        builder.post(RequestBody.create(MEDIA_TYPE_MARKDOWN,"Hello world github/linguist#1 **cool**, and #1!"));
+        Request request = builder.build();
+        Call call = mClient.newCall(request);
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                if (response.isSuccessful()){
+                    final String content = response.body().string();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mTextView.setText(content);
+                        }
+                    });
+                }
+            }
+        });
     }
 
     private void clear(){
